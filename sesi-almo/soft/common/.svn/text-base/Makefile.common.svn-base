@@ -1,0 +1,67 @@
+CC = mipsel-unknown-elf-gcc
+AS = mipsel-unknown-elf-as
+LD = mipsel-unknown-elf-ld
+DU = mipsel-unknown-elf-objdump
+
+SYS_OBJS = reset.o \
+		   giet.o \
+		   common.o \
+		   ctx_handler.o \
+		   drivers.o \
+		   exc_handler.o \
+		   irq_handler.o \
+		   sys_handler.o
+
+APP_OBJS ?= stdio.o main.o
+SYS_BIN = sys.bin
+APP_BIN = app.bin
+
+GIET ?= ../../giet
+SRC ?= main.c
+
+SYS_PATH = $(GIET)/sys
+APP_PATH = $(GIET)/app
+
+SYS_CFLAGS = -Wall -ffreestanding -mno-gpopt -mips32 -I$(SYS_PATH) -I.
+APP_CFLAGS = -Wall -ffreestanding -mno-gpopt -mips32 -I$(APP_PATH) -I.
+
+all: $(SYS_BIN) $(APP_BIN)
+
+## system compilation
+
+$(SYS_BIN): $(SYS_OBJS) sys.ld seg.ld config.h
+	$(LD) -o $@ -T sys.ld $(SYS_OBJS)
+	$(DU) -D $@ > $@.txt
+
+reset.o: reset.s
+	$(AS) -g -mips32 -o $@ $<
+
+giet.o: $(SYS_PATH)/giet.s
+	$(AS) -g -mips32 -o $@ $<
+
+%.o: $(SYS_PATH)/%.c $(SYS_PATH)/%.h config.h
+	$(CC) $(SYS_CFLAGS) -c -o $@ $<
+
+## app compilation
+
+$(APP_BIN): $(APP_OBJS) app.ld seg.ld
+	$(LD) -o $@ -T app.ld $(APP_OBJS)
+	$(DU) -D $@ > $@.txt
+
+stdio.o: $(APP_PATH)/stdio.c $(APP_PATH)/stdio.h
+	$(CC) $(APP_CFLAGS) -c -o $@ $<
+
+main.o: $(SRC)
+	$(CC) $(APP_CFLAGS) -c -o $@ $<
+
+### special rules
+
+clean:
+	rm -f *.o *.bin $(SYS_BIN).txt $(APP_BIN).txt proc*
+
+
+SIMUL_PATH ?= ../../../hard/almo_generic
+SIMUL_ARGS += -SYS sys.bin -APP app.bin
+run: all
+	$(SIMUL_PATH)/simul_almo_generic $(SIMUL_ARGS)
+
