@@ -4,7 +4,7 @@ cd $(dirname $0)
 WORKDIR=$(pwd)
 
 echo 'Creating almo_env.sh'
-m4 -D INSTALL_DIR=$WORKDIR $WORKDIR/almo_env.sh.m4 > $WORKDIR/almo_env.sh
+sed -e "s%INSTALL_DIR%$WORKDIR%" $WORKDIR/almo_env.sh.m4 > $WORKDIR/almo_env.sh
 
 if grep -q li312_simul_path ~/.bashrc; then
   echo "old installation detected, updating to source $WORKDIR/almo_env.sh"
