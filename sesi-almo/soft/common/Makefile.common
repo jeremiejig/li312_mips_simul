@@ -63,5 +63,5 @@ clean:
 SIMUL_PATH ?= ../../../hard/almo_generic
 SIMUL_ARGS += -SYS sys.bin -APP app.bin
 run: all
-	$(SIMUL_PATH)/simul_almo_generic $(SIMUL_ARGS)
+	simul_almo_generic $(SIMUL_ARGS)
 
