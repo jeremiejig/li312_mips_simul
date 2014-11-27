@@ -10,6 +10,6 @@ if grep -q li312_simul_path ~/.bashrc; then
   echo -e "old installation detected, updating to source $WORKDIR/almo_env.sh"
   sed -e "s%^\(li312_simul_path=\).*$%\1'$WORKDIR'%" -i ~/.bashrc
 else
-  echo -e "Appending 'source $WORKDIR/almo_env.sh in ~/.bashrc'"
-  echo "\n# almo env\nli312_simul_path='$WORKDIR'\nsource \$li312_simul_path/almo_env.sh\n" >> $HOME/.bashrc
+  echo "Appending 'source $WORKDIR/almo_env.sh in ~/.bashrc'"
+  echo -e "\n# almo env\nli312_simul_path='$WORKDIR'\nsource \$li312_simul_path/almo_env.sh\n" >> $HOME/.bashrc
 fi;
